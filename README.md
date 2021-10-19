@@ -5,6 +5,7 @@
 * IP Intelectual Properties 
   * Reusable unit of Logic/cell/Layout
   * IPs reduce design and testing time
+  ![image]()
 * On Chip CLock Multiplier
   * achieves high frequency clock signal from low frequency as quartz can only few MHz
   * need of clock signals for processor type synchronous
