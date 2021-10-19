@@ -1,5 +1,8 @@
 # VSDOpen-PLL-OSU180nm
 ## VSD Open PLL/OSU180nm Documentation 
+
+This Repository Focuses on On-Clock Chip using OSU180nm Technology. The repository is divided in subsections which briefly traverses through the design steps as well as design blocks in brief.
+
 ## 1. Introduction
 
 * IP Intelectual Properties 
@@ -54,8 +57,122 @@
 3. Netlist Extraction
 4. Netlist Modification
 5. Run
+### 3.2 Sub-Blocks
+#### Inverter
+```
+****************************
+*Inverter
+***************************
 
-### 3.2 Phase Frequency Detector
+.include osu018.lib
+
+M1 out in GND GND nfet l=180n w=180n
+M2 VDD in out VDD pfet l=180n w=360n
+
+V1 in 0 PULSE 0 1.8 10p 50p 50p 100n 200n
+v2 VDD 0 1.8
+
+
+.control
+tran 0.01ns 400ns
+plot v(in)+2 v(out)
+.endc
+
+.end
+
+```
+#### Nand 2-Input
+```
+****************************
+*2 input nand
+***************************
+
+.include osu018.lib
+
+M1 out in1 N001 N001 nfet l=180n w=180n
+M2 VDD in2 out VDD pfet l=180n w=360n
+M3 VDD in1 out VDD pfet l=180n w=360n
+M4 N001 in2 GND GND nfet l=180n w=360n
+
+
+V1 in1 0 PULSE 0 1.8 10p 50p 50p 100n 200n
+V2 in2 0 PULSE 0 1.8 10p 50p 50p 50n 100n
+V3 VDD 0 1.8
+
+
+.control
+tran .1ns 200n
+plot V(in1)+4 V(in2)+2 V(out)
+.endc
+
+
+.end
+```
+#### NAND 3 Input
+```
+****************************
+*3 input nand
+***************************
+
+
+.include osu018.lib
+
+M1 out in1 N001 N001 nfet l=180n w=540n
+M2 VDD in2 out VDD pfet l=180n w=360n
+M3 VDD in1 out VDD pfet l=180n w=360n
+M4 N001 in2 N002 N002 nfet l=180n w=540n
+M5 N002 in3 GND GND nfet l=180n w=540n
+M6 VDD in3 out VDD pfet l=180n w=360n
+
+
+
+V1 in1 0 PULSE 0 1.8 10p 50p 50p 100n 200n
+V2 in2 0 PULSE 0 1.8 10p 50p 50p 50n 100n
+V3 in3 0 PULSE 0 1.8 10p 50p 50p 25n 50n
+V4 VDD 0 1.8
+
+
+.control
+tran .1ns 200n
+plot V(in1)+6 V(in2)+4 V(in3)+2 V(out)
+.endc
+
+
+.end
+```
+#### NAND 4 Input
+```
+****************************
+*4 input nand
+***************************
+
+.include osu018.lib
+
+M1 out in1 N001 N001 nfet l=180n w=720n
+M2 VDD in2 out VDD pfet l=180n w=360n
+M3 VDD in1 out VDD pfet l=180n w=360n
+M4 N001 in2 N002 N002 nfet l=180n w=720n
+M5 N002 in3 N003 N003 nfet l=180n w=720n
+M6 VDD in3 out VDD pfet l=180n w=360n
+M7 N003 in4 GND GND nfet l=180n w=720n
+M8 VDD in4 out VDD pfet l=180n w=360n
+
+V1 in1 0 PULSE 0 1.8 10p 50p 50p 100n 200n
+V2 in2 0 PULSE 0 1.8 10p 50p 50p 50n 100n
+V3 in3 0 PULSE 0 1.8 10p 50p 50p 25n 50n
+V4 in4 0 PULSE 0 1.8 10p 50p 50p 12.5n 25n
+V5 VDD 0 1.8
+
+
+.control
+tran .1ns 200n
+plot V(in1)+8 V(in2)+6 V(in3)+4 V(in4)+2 V(out)
+.endc
+
+
+.end
+```
+### 3.3 Phase Frequency Detector
 * A phase detector or phase comparator is a frequency mixer, analog multiplier or logic circuit that generates a signal which represents the difference in phase between two signal inputs.
 * Possible Outcomes 
   * Leading UP=1, DOWN=0
@@ -150,7 +267,7 @@ plot V(f_clk_in)+6 V(f_VCO)+4 V(up)+2 V(down)
 
 ![pfd](https://user-images.githubusercontent.com/92792321/137955523-703c3730-6568-4e68-a4cf-155c0020a08d.PNG)
 
-### 3.3 Charge Pump
+### 3.4 Charge Pump
 * A charge pump is a kind of DC-to-DC converter that uses capacitors for energetic charge storage to raise or lower voltage.
 ![charge pump](https://user-images.githubusercontent.com/92792321/137955688-015f67dc-d145-4905-8229-33c84406125a.PNG)
 * Code
@@ -346,7 +463,7 @@ plot V(f_in)+8 V(f_out_8)+6 V(up)+4 V(down)+2 V(vin_vco)
   * With Low-Pass Filter
 ![pfd_cp_with lowpass](https://user-images.githubusercontent.com/92792321/137955877-49b9da39-dca9-45a6-b923-ca26a9f2a9a2.PNG)
 
-### 3.4 VCO
+### 3.5 VCO
 * A voltage-controlled oscillator (VCO) is an electronic oscillator whose oscillation frequency is controlled by a voltage input
 * Higher the voltage, Higher Frequency at output
 
@@ -414,7 +531,7 @@ plot V(Vinvco)+2 V(osc_fb)
 
 ![VCO](https://user-images.githubusercontent.com/92792321/137956281-46fcee77-bb2d-468c-af5b-687f7be88b7b.PNG)
 
-### 3.5 Frequency Divider
+### 3.6 Frequency Divider
 * Simply a D flip-flop.
 * Divides frequency by factor of 2
 * Code
@@ -465,7 +582,7 @@ plot V(clock)+2 V(q)
 
 ![FrepD](https://user-images.githubusercontent.com/92792321/137956406-5b9d84fe-63e6-4ff8-b71f-9eb4acdc3e5e.PNG)
 
-### 3.6 PLL Pre-Playout
+### 3.7 PLL Pre-Playout
 #### Final Code
 ```
 *__________________PLL-combined in 1 file_________________________*
@@ -638,3 +755,34 @@ plot V(f_in)+8 V(up)+6 V(down)+4 V(Vin_vco)+2 V(f_out)
 
 ```
 ![PLL](https://user-images.githubusercontent.com/92792321/137956601-d3bb9afb-96b7-4db9-9f44-4de76f31d4ab.PNG)
+
+## 4. Physical Design
+
+### 4.1 Standard Cell Layout
+![Std_cells](https://user-images.githubusercontent.com/92792321/137958588-7de0d698-122c-4b2c-a3eb-1a04e2a9494b.PNG)
+### 4.2 Phase Frequency Detector
+![pfd](https://user-images.githubusercontent.com/92792321/137958803-3e45b42b-4019-4fc1-acd3-5133e9c5f15b.PNG)
+### 4.3 Voltage Controlled Oscillator 
+![image](https://user-images.githubusercontent.com/92792321/137959097-ae60c774-0379-4a82-822b-99371750653b.png)
+### 4.4 Frequency Divider
+![fd2](https://user-images.githubusercontent.com/92792321/137959682-24b2590d-e8a8-4d20-a4cc-f3d8d93ca6f6.PNG)
+### 4.5 Frequency Divider 8 Factor
+Is Just 3 Frequency Divider by 2 factor in series.
+### 4.6 MUX 2:1
+![Mux](https://user-images.githubusercontent.com/92792321/137959971-73c6df0a-1377-40d4-9b4b-7850f2df1d23.PNG)
+### 4.7 PLL Final Layout
+![image](https://user-images.githubusercontent.com/92792321/137960189-871d7746-ca1f-442f-a7ed-ce9e935f9ea0.png)
+
+## 5. Post-Layout Simulation
+![PLL final1](https://user-images.githubusercontent.com/92792321/137961496-c2e7be1c-31dd-4c58-b26c-ff7c040d1fe1.PNG)
+![PLL final2](https://user-images.githubusercontent.com/92792321/137961500-7e7ae96a-007a-4b00-a3dc-8f6f7c86987b.PNG)
+![PLL final3](https://user-images.githubusercontent.com/92792321/137961501-f4b5d320-fadf-4bb6-b58d-b7e8e358fe66.PNG)
+![PLL final4](https://user-images.githubusercontent.com/92792321/137961504-a5c6df48-0e49-4f54-a2f1-59c502d9040c.PNG)
+
+
+## 6. Author
+Aryan Sehgal, 3rd Year Undergrade, National Institute of Technology, Hamirpur
+
+## 7. Acknowledgement
+* Paras Gidd, M.Tech.( Microelectronics ), Manipal Institute of Technology,(MAHE), parasgidd@gmail.com
+* Kunal Ghosh, Co-founder, VSD Corp. Pvt. Ltd. - kunalpghosh@gmail.com
